@@ -1,0 +1,101 @@
+AHU preprocessing report
+Generated at: 2026-05-22T00:55:40
+Raw directory: C:\Users\haojie\Project\Degree\AHU data
+Output directory: C:\Users\haojie\Project\Degree\data_processed
+Frequency: 5 min
+Measurement interpolation max gap: 60 min
+Common time range: 2021-11-23 18:30:00 -> 2023-12-31 05:00:00
+Rows in clean dataset: 221023
+Rows in running dataset: 218747
+Rows in model-ready complete dataset: 72619
+
+T_out (Outdoor air intake temperature.xlsx)
+  kind: measurement
+  raw_count: 338457
+  used_count: 337192
+  bins_before_fill: 102821
+  missing_after_fill: 66881
+  zero_as_missing_count: 1265
+  source_time_range: 2019-12-06 20:41:11 -> 2023-12-31 16:31:18
+  source_value_range: -7.8 -> 32.8
+
+T_ret (Extract air temperature.xlsx)
+  kind: measurement
+  raw_count: 537747
+  used_count: 537732
+  bins_before_fill: 87305
+  missing_after_fill: 106438
+  zero_as_missing_count: 15
+  source_time_range: 2020-03-21 06:31:15 -> 2023-12-31 18:50:55
+  source_value_range: 0.0 -> 29.9
+
+T_rec (Temperature after heat recovery.xlsx)
+  kind: measurement
+  raw_count: 1048575
+  used_count: 1048561
+  bins_before_fill: 173971
+  missing_after_fill: 47050
+  zero_as_missing_count: 14
+  source_time_range: 2021-01-30 17:37:39 -> 2023-12-31 17:07:22
+  source_value_range: 0.0 -> 32.3
+
+T_coil (Heating coil temperature.xlsx)
+  kind: measurement
+  raw_count: 1048575
+  used_count: 1048571
+  bins_before_fill: 245783
+  missing_after_fill: 8245
+  zero_as_missing_count: 4
+  source_time_range: 2021-04-05 05:44:07 -> 2023-12-31 18:13:32
+  source_value_range: 0.0 -> 41.0
+
+T_sup (Supply air temperature.xlsx)
+  kind: measurement
+  raw_count: 1048575
+  used_count: 1048571
+  bins_before_fill: 254968
+  missing_after_fill: 8262
+  zero_as_missing_count: 4
+  source_time_range: 2021-03-13 12:12:53 -> 2023-12-31 18:39:01
+  source_value_range: 0.0 -> 47.5
+
+pressure_hex (Pressure across the heat exchanger.xlsx)
+  kind: measurement
+  raw_count: 1048575
+  used_count: 1048575
+  bins_before_fill: 146646
+  missing_after_fill: 32051
+  zero_as_missing_count: 0
+  source_time_range: 2021-11-23 18:33:42 -> 2023-12-31 18:27:58
+  source_value_range: 0.0 -> 93.0
+
+u_heat (Heating actuator control signal.xlsx)
+  kind: control
+  raw_count: 426647
+  used_count: 426647
+  bins_before_fill: 127197
+  missing_after_fill: 2
+  zero_as_missing_count: 0
+  source_time_range: 2020-01-21 00:53:47 -> 2023-12-31 05:12:58
+  source_value_range: 0.0 -> 100.0
+
+u_heat_recovery (Heat recovery control signal.xlsx)
+  kind: control
+  raw_count: 152548
+  used_count: 152548
+  bins_before_fill: 23180
+  missing_after_fill: 702
+  zero_as_missing_count: 0
+  source_time_range: 2019-08-26 03:16:00 -> 2023-12-31 05:02:43
+  source_value_range: 0.0 -> 100.0
+
+u_FF1 (Control signal FF1.xlsx)
+  kind: control
+  raw_count: 147692
+  used_count: 147692
+  bins_before_fill: 72274
+  missing_after_fill: 41
+  zero_as_missing_count: 0
+  source_time_range: 2019-10-31 13:47:52 -> 2023-12-31 15:26:08
+  source_value_range: 0.0 -> 100.0
+

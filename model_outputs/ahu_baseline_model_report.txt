@@ -1,0 +1,297 @@
+AHU initial dynamic modeling report
+Input: C:\Users\haojie\Project\Degree\data_processed\ahu_model_5min.csv
+Generated at: 2026-05-22T00:55:44
+Expected interval: 5 min
+Horizons: 1, 3, 6, 12 steps
+
+Horizon: 1 steps (5 min)
+Consecutive samples: 69003
+Splits: train=48302, val=10350, test=10351
+Feature columns: T_out, T_ret, T_rec, T_coil, T_sup, pressure_hex, u_heat, u_heat_recovery, u_FF1, hour_sin, hour_cos, year_sin, year_cos
+
+Target: T_rec(t+1)
+train/persist n= 48302 MAE=0.0782 RMSE=0.1428 R2=0.9982 bias=0.0000
+train/linear  n= 48302 MAE=0.0778 RMSE=0.1391 R2=0.9982 bias=0.0000
+val/persist   n= 10350 MAE=0.1060 RMSE=0.1543 R2=0.9949 bias=-0.0020
+val/linear    n= 10350 MAE=0.1051 RMSE=0.1484 R2=0.9952 bias=0.0030
+test/persist  n= 10351 MAE=0.0792 RMSE=0.1674 R2=0.9971 bias=0.0016
+test/linear   n= 10351 MAE=0.0832 RMSE=0.1657 R2=0.9972 bias=0.0062
+Top standardized linear coefficients:
+  T_rec             3.231502
+  T_out             0.100635
+  T_sup             0.030512
+  hour_cos         -0.020652
+  u_heat_recovery   0.019227
+  hour_sin          0.018629
+  year_cos         -0.016626
+  u_heat            0.008880
+
+Target: T_sup(t+1)
+train/persist n= 48302 MAE=0.1571 RMSE=0.2657 R2=0.9954 bias=0.0001
+train/linear  n= 48302 MAE=0.1575 RMSE=0.2625 R2=0.9955 bias=0.0000
+val/persist   n= 10350 MAE=0.1298 RMSE=0.1939 R2=0.9849 bias=0.0051
+val/linear    n= 10350 MAE=0.1421 RMSE=0.2047 R2=0.9831 bias=0.0448
+test/persist  n= 10351 MAE=0.1943 RMSE=0.3733 R2=0.9918 bias=0.0013
+test/linear   n= 10351 MAE=0.2012 RMSE=0.3752 R2=0.9917 bias=0.0181
+Top standardized linear coefficients:
+  T_sup             3.704004
+  T_coil            0.183235
+  T_out            -0.072843
+  pressure_hex     -0.037058
+  u_heat           -0.019544
+  u_FF1             0.018803
+  T_ret            -0.013239
+  T_rec             0.013081
+
+Target: T_coil(t+1)
+train/persist n= 48302 MAE=0.1460 RMSE=0.3024 R2=0.9872 bias=0.0060
+train/linear  n= 48302 MAE=0.1540 RMSE=0.2896 R2=0.9882 bias=-0.0000
+val/persist   n= 10350 MAE=0.1088 RMSE=0.1694 R2=0.9807 bias=0.0038
+val/linear    n= 10350 MAE=0.1435 RMSE=0.1924 R2=0.9751 bias=-0.0813
+test/persist  n= 10351 MAE=0.1788 RMSE=0.4227 R2=0.9710 bias=0.0098
+test/linear   n= 10351 MAE=0.1929 RMSE=0.4055 R2=0.9733 bias=-0.0132
+Top standardized linear coefficients:
+  T_coil            2.319441
+  T_sup             0.313561
+  pressure_hex      0.118463
+  T_rec             0.069431
+  u_FF1            -0.061859
+  T_ret             0.054978
+  year_cos          0.041778
+  u_heat_recovery   0.034654
+
+Target: pressure_hex(t+1)
+train/persist n= 48302 MAE=0.3643 RMSE=2.2217 R2=0.7796 bias=-0.0688
+train/linear  n= 48302 MAE=0.5876 RMSE=1.7242 R2=0.8673 bias=-0.0000
+val/persist   n= 10350 MAE=0.4069 RMSE=1.8463 R2=-0.3374 bias=-0.0211
+val/linear    n= 10350 MAE=0.9470 RMSE=1.7278 R2=-0.1712 bias=0.8684
+test/persist  n= 10351 MAE=0.4200 RMSE=2.2163 R2=0.4068 bias=-0.0828
+test/linear   n= 10351 MAE=1.1055 RMSE=2.0119 R2=0.5112 bias=-0.0766
+Top standardized linear coefficients:
+  u_FF1             2.006325
+  pressure_hex      1.315067
+  T_coil            1.029769
+  T_sup            -0.987634
+  T_out             0.796269
+  year_sin         -0.486613
+  u_heat           -0.366407
+  T_rec            -0.293811
+
+Horizon: 3 steps (15 min)
+Consecutive samples: 62750
+Splits: train=43925, val=9412, test=9413
+Feature columns: T_out, T_ret, T_rec, T_coil, T_sup, pressure_hex, u_heat, u_heat_recovery, u_FF1, hour_sin, hour_cos, year_sin, year_cos
+
+Target: T_rec(t+3)
+train/persist n= 43925 MAE=0.1610 RMSE=0.2529 R2=0.9942 bias=-0.0027
+train/linear  n= 43925 MAE=0.1449 RMSE=0.2299 R2=0.9952 bias=0.0000
+val/persist   n=  9412 MAE=0.2195 RMSE=0.3018 R2=0.9805 bias=-0.0091
+val/linear    n=  9412 MAE=0.1939 RMSE=0.2731 R2=0.9841 bias=-0.0216
+test/persist  n=  9413 MAE=0.1642 RMSE=0.2892 R2=0.9915 bias=0.0006
+test/linear   n=  9413 MAE=0.1679 RMSE=0.2783 R2=0.9921 bias=0.0080
+Top standardized linear coefficients:
+  T_rec             3.225756
+  T_sup             0.162843
+  T_out             0.142106
+  T_coil           -0.095220
+  pressure_hex      0.090686
+  hour_sin          0.066699
+  hour_cos         -0.052739
+  u_heat            0.052267
+
+Target: T_sup(t+3)
+train/persist n= 43925 MAE=0.2942 RMSE=0.5054 R2=0.9830 bias=0.0029
+train/linear  n= 43925 MAE=0.2926 RMSE=0.5006 R2=0.9833 bias=0.0000
+val/persist   n=  9412 MAE=0.2842 RMSE=0.4362 R2=0.9266 bias=0.0146
+val/linear    n=  9412 MAE=0.2897 RMSE=0.4405 R2=0.9252 bias=0.0248
+test/persist  n=  9413 MAE=0.3945 RMSE=0.8001 R2=0.9618 bias=-0.0050
+test/linear   n=  9413 MAE=0.4037 RMSE=0.7937 R2=0.9624 bias=0.0206
+Top standardized linear coefficients:
+  T_sup             3.642649
+  T_out            -0.284516
+  T_rec             0.189184
+  year_cos          0.081974
+  T_coil            0.079423
+  u_heat           -0.067992
+  hour_cos         -0.030889
+  pressure_hex      0.023643
+
+Target: T_coil(t+3)
+train/persist n= 43925 MAE=0.2572 RMSE=0.4750 R2=0.9678 bias=0.0056
+train/linear  n= 43925 MAE=0.2617 RMSE=0.4558 R2=0.9704 bias=-0.0000
+val/persist   n=  9412 MAE=0.2246 RMSE=0.3568 R2=0.9177 bias=0.0107
+val/linear    n=  9412 MAE=0.2649 RMSE=0.3661 R2=0.9134 bias=-0.1053
+test/persist  n=  9413 MAE=0.3305 RMSE=0.6872 R2=0.9220 bias=0.0091
+test/linear   n=  9413 MAE=0.3473 RMSE=0.6678 R2=0.9264 bias=-0.0142
+Top standardized linear coefficients:
+  T_coil            2.120438
+  T_sup             0.396878
+  T_rec             0.269472
+  T_out            -0.210465
+  pressure_hex      0.171676
+  year_cos          0.098065
+  u_FF1            -0.084830
+  T_ret             0.058035
+
+Target: pressure_hex(t+3)
+train/persist n= 43925 MAE=0.4647 RMSE=2.5495 R2=0.6987 bias=-0.0544
+train/linear  n= 43925 MAE=0.7173 RMSE=1.9615 R2=0.8216 bias=-0.0000
+val/persist   n=  9412 MAE=0.4868 RMSE=1.9283 R2=-0.5753 bias=-0.0039
+val/linear    n=  9412 MAE=1.1752 RMSE=1.8759 R2=-0.4908 bias=1.1183
+test/persist  n=  9413 MAE=0.5891 RMSE=2.6299 R2=0.1322 bias=-0.0700
+test/linear   n=  9413 MAE=1.3656 RMSE=2.2859 R2=0.3443 bias=0.0607
+Top standardized linear coefficients:
+  u_FF1             2.318903
+  T_out             1.254463
+  year_sin         -0.649033
+  T_coil            0.549472
+  T_sup            -0.464486
+  T_rec            -0.410557
+  u_heat           -0.410502
+  u_heat_recovery  -0.340482
+
+Horizon: 6 steps (30 min)
+Consecutive samples: 55037
+Splits: train=38525, val=8256, test=8256
+Feature columns: T_out, T_ret, T_rec, T_coil, T_sup, pressure_hex, u_heat, u_heat_recovery, u_FF1, hour_sin, hour_cos, year_sin, year_cos
+
+Target: T_rec(t+6)
+train/persist n= 38525 MAE=0.2778 RMSE=0.3925 R2=0.9862 bias=-0.0106
+train/linear  n= 38525 MAE=0.2235 RMSE=0.3304 R2=0.9902 bias=-0.0000
+val/persist   n=  8256 MAE=0.3663 RMSE=0.4799 R2=0.9502 bias=-0.0219
+val/linear    n=  8256 MAE=0.2827 RMSE=0.4027 R2=0.9649 bias=0.0035
+test/persist  n=  8256 MAE=0.2736 RMSE=0.4080 R2=0.9836 bias=-0.0090
+test/linear   n=  8256 MAE=0.2630 RMSE=0.3895 R2=0.9850 bias=0.0174
+Top standardized linear coefficients:
+  T_rec             3.249716
+  T_sup             0.193705
+  hour_sin          0.146974
+  T_out             0.142163
+  u_heat            0.117286
+  hour_cos         -0.102078
+  pressure_hex      0.094697
+  T_coil           -0.083876
+
+Target: T_sup(t+6)
+train/persist n= 38525 MAE=0.4499 RMSE=0.7470 R2=0.9615 bias=0.0048
+train/linear  n= 38525 MAE=0.4415 RMSE=0.7323 R2=0.9630 bias=0.0000
+val/persist   n=  8256 MAE=0.4910 RMSE=0.7197 R2=0.8055 bias=0.0285
+val/linear    n=  8256 MAE=0.4881 RMSE=0.7189 R2=0.8060 bias=0.0278
+test/persist  n=  8256 MAE=0.6015 RMSE=1.1116 R2=0.9234 bias=-0.0233
+test/linear   n=  8256 MAE=0.6146 RMSE=1.0991 R2=0.9251 bias=0.0221
+Top standardized linear coefficients:
+  T_sup             3.516026
+  T_out            -0.603176
+  T_rec             0.462105
+  year_cos          0.175380
+  u_heat           -0.103527
+  u_heat_recovery  -0.077765
+  hour_cos         -0.061305
+  hour_sin          0.049564
+
+Target: T_coil(t+6)
+train/persist n= 38525 MAE=0.3860 RMSE=0.6451 R2=0.9396 bias=0.0042
+train/linear  n= 38525 MAE=0.3771 RMSE=0.6155 R2=0.9450 bias=0.0000
+val/persist   n=  8256 MAE=0.3769 RMSE=0.5647 R2=0.7973 bias=0.0210
+val/linear    n=  8256 MAE=0.4091 RMSE=0.5548 R2=0.8043 bias=-0.0929
+test/persist  n=  8256 MAE=0.4885 RMSE=0.8931 R2=0.8642 bias=0.0010
+test/linear   n=  8256 MAE=0.5001 RMSE=0.8659 R2=0.8723 bias=-0.0083
+Top standardized linear coefficients:
+  T_coil            1.910084
+  T_rec             0.566633
+  T_out            -0.506048
+  T_sup             0.439734
+  year_cos          0.164442
+  pressure_hex      0.142620
+  u_heat           -0.077018
+  u_FF1            -0.068325
+
+Target: pressure_hex(t+6)
+train/persist n= 38525 MAE=0.4825 RMSE=2.3801 R2=0.7232 bias=-0.0435
+train/linear  n= 38525 MAE=0.7285 RMSE=1.8835 R2=0.8267 bias=0.0000
+val/persist   n=  8256 MAE=0.5351 RMSE=1.9051 R2=-0.6338 bias=-0.0001
+val/linear    n=  8256 MAE=1.2239 RMSE=1.8694 R2=-0.5731 bias=1.1683
+test/persist  n=  8256 MAE=0.6807 RMSE=2.5116 R2=0.1119 bias=-0.0563
+test/linear   n=  8256 MAE=1.3643 RMSE=2.1529 R2=0.3474 bias=0.2927
+Top standardized linear coefficients:
+  u_FF1             1.997552
+  T_out             1.689893
+  T_rec            -0.709805
+  year_sin         -0.656729
+  pressure_hex      0.509281
+  u_heat           -0.424082
+  year_cos         -0.312446
+  u_heat_recovery  -0.202656
+
+Horizon: 12 steps (60 min)
+Consecutive samples: 43107
+Splits: train=30174, val=6466, test=6467
+Feature columns: T_out, T_ret, T_rec, T_coil, T_sup, pressure_hex, u_heat, u_heat_recovery, u_FF1, hour_sin, hour_cos, year_sin, year_cos
+
+Target: T_rec(t+12)
+train/persist n= 30174 MAE=0.5223 RMSE=0.6782 R2=0.9585 bias=-0.0290
+train/linear  n= 30174 MAE=0.3635 RMSE=0.5001 R2=0.9774 bias=-0.0000
+val/persist   n=  6466 MAE=0.6376 RMSE=0.7819 R2=0.8695 bias=-0.0638
+val/linear    n=  6466 MAE=0.4077 RMSE=0.5679 R2=0.9312 bias=0.0328
+test/persist  n=  6467 MAE=0.4640 RMSE=0.6159 R2=0.9631 bias=-0.0411
+test/linear   n=  6467 MAE=0.4174 RMSE=0.5634 R2=0.9691 bias=0.0077
+Top standardized linear coefficients:
+  T_rec             3.212944
+  hour_sin          0.336277
+  T_sup             0.269820
+  u_heat            0.251007
+  u_heat_recovery  -0.219929
+  T_out             0.199456
+  hour_cos         -0.194806
+  T_ret            -0.162966
+
+Target: T_sup(t+12)
+train/persist n= 30174 MAE=0.6988 RMSE=1.0689 R2=0.9148 bias=0.0104
+train/linear  n= 30174 MAE=0.6581 RMSE=1.0228 R2=0.9220 bias=-0.0000
+val/persist   n=  6466 MAE=0.8129 RMSE=1.1144 R2=0.5689 bias=0.0449
+val/linear    n=  6466 MAE=0.7811 RMSE=1.0791 R2=0.5957 bias=-0.0120
+test/persist  n=  6467 MAE=0.8241 RMSE=1.3702 R2=0.8717 bias=-0.0527
+test/linear   n=  6467 MAE=0.8172 RMSE=1.3429 R2=0.8767 bias=0.0004
+Top standardized linear coefficients:
+  T_sup             3.390733
+  T_out            -0.941449
+  T_rec             0.836891
+  year_cos          0.360015
+  T_coil           -0.330802
+  u_heat_recovery  -0.198104
+  u_heat           -0.131740
+  hour_sin          0.124789
+
+Target: T_coil(t+12)
+train/persist n= 30174 MAE=0.6031 RMSE=0.8945 R2=0.8795 bias=0.0038
+train/linear  n= 30174 MAE=0.5503 RMSE=0.8230 R2=0.8980 bias=-0.0000
+val/persist   n=  6466 MAE=0.6194 RMSE=0.8508 R2=0.5780 bias=0.0332
+val/linear    n=  6466 MAE=0.6138 RMSE=0.7913 R2=0.6349 bias=-0.1111
+test/persist  n=  6467 MAE=0.6611 RMSE=1.0908 R2=0.7820 bias=-0.0160
+test/linear   n=  6467 MAE=0.6482 RMSE=1.0362 R2=0.8033 bias=-0.0264
+Top standardized linear coefficients:
+  T_coil            1.450276
+  T_rec             0.911476
+  T_out            -0.735512
+  T_sup             0.660599
+  year_cos          0.275863
+  u_heat_recovery  -0.175640
+  hour_sin          0.164431
+  hour_cos         -0.136379
+
+Target: pressure_hex(t+12)
+train/persist n= 30174 MAE=0.5405 RMSE=2.3425 R2=0.7190 bias=-0.0534
+train/linear  n= 30174 MAE=0.7666 RMSE=1.8700 R2=0.8209 bias=0.0000
+val/persist   n=  6466 MAE=0.6009 RMSE=1.9576 R2=-0.7900 bias=0.0061
+val/linear    n=  6466 MAE=1.3167 RMSE=1.9242 R2=-0.7295 bias=1.2556
+test/persist  n=  6467 MAE=0.8207 RMSE=2.4735 R2=0.0829 bias=-0.0411
+test/linear   n=  6467 MAE=1.4325 RMSE=2.1742 R2=0.2914 bias=0.5918
+Top standardized linear coefficients:
+  T_out             1.845687
+  u_FF1             1.717790
+  T_rec            -0.874820
+  pressure_hex      0.672864
+  year_sin         -0.667137
+  u_heat           -0.466115
+  T_sup             0.351679
+  year_cos         -0.332847
