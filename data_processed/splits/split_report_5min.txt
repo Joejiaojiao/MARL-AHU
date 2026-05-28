@@ -1,0 +1,25 @@
+AHU model-ready data split report
+Generated at: 2026-05-28T15:28:07
+Input: data_processed\ahu_model_5min.csv
+Method: chronological split by timestamp
+Ratios: train=0.70, validation=0.15, test=0.15
+Total rows: 72619
+Columns: timestamp, T_out, T_ret, T_rec, T_coil, T_sup, pressure_hex, u_heat, u_heat_recovery, u_FF1, is_running
+
+train:
+  rows: 50833
+  start: 2021-11-26 05:00:00
+  end: 2023-06-17 21:45:00
+  missing_values: 0
+
+validation:
+  rows: 10892
+  start: 2023-06-17 21:50:00
+  end: 2023-08-27 09:05:00
+  missing_values: 0
+
+test:
+  rows: 10894
+  start: 2023-08-27 09:10:00
+  end: 2023-12-31 05:00:00
+  missing_values: 0
