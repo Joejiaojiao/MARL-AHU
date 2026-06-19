@@ -1,0 +1,123 @@
+AHU v5 SINDy-MIMO model report
+Generated: 2026-06-19T12:10:26
+Alpha (Lasso L1): 0.0001
+Frequency: 5 min
+Exogenous (real values in rollout): ['T_out', 'T_ret']
+Predicted states: ['T_rec', 'T_coil', 'T_sup']
+Feature library size: 24
+
+Active Lasso coefficients per output:
+  delta_T_rec  intercept=-0.000494  active=19/24
+    T_ret*T_sup           +0.046027
+    T_out*T_sup           +0.041868
+    T_out*T_rec           +0.032411
+    T_rec*T_coil          -0.029195
+    T_ret*T_ret           -0.019661
+    cos_day               -0.018760
+    sin_day               +0.016822
+    T_rec                 -0.016514
+    T_ret*T_rec           -0.016082
+    T_out                 -0.010353
+    T_rec*T_sup           -0.010213
+    T_out*T_out           +0.010195
+    T_sup*T_sup           -0.009498
+    T_ret*T_coil          +0.007276
+    sin_year              +0.006725
+    T_coil*T_coil         -0.005432
+    T_coil*T_sup          -0.002656
+    T_ret                 -0.001871
+    cos_year              -0.000261
+
+  delta_T_coil  intercept=-0.006590  active=22/24
+    T_coil*T_coil         -1.053094
+    T_out*T_coil          +0.616610
+    T_coil*T_sup          +0.383898
+    T_ret*T_coil          +0.353098
+    T_out*T_sup           -0.308901
+    T_ret*T_ret           -0.288388
+    T_sup*T_sup           +0.255282
+    T_out                 -0.203223
+    T_out*T_rec           +0.182410
+    T_ret                 +0.146299
+    T_coil                +0.112518
+    T_rec*T_sup           -0.103556
+    T_out*T_out           -0.079865
+    T_sup                 +0.070366
+    T_rec*T_coil          +0.046783
+    T_rec*T_rec           -0.035804
+    cos_year              +0.033111
+    T_rec                 +0.014752
+    cos_day               -0.010478
+    sin_year              +0.003773
+    T_ret*T_sup           +0.003200
+    sin_day               +0.000975
+
+  delta_T_sup  intercept=-0.000991  active=22/24
+    T_sup*T_sup           -0.223472
+    T_out*T_sup           +0.205689
+    T_out*T_coil          -0.186288
+    T_coil*T_coil         +0.174834
+    T_rec*T_coil          -0.130784
+    T_out*T_out           +0.086327
+    T_coil                +0.085824
+    T_out                 -0.078251
+    T_rec*T_sup           +0.066763
+    T_out*T_ret           -0.055579
+    T_coil*T_sup          -0.053555
+    T_sup                 -0.022269
+    cos_year              +0.014897
+    T_ret                 +0.011290
+    T_ret*T_coil          -0.010655
+    cos_day               -0.009798
+    sin_day               +0.008438
+    sin_year              +0.004978
+    T_ret*T_rec           +0.003787
+    T_rec*T_rec           +0.001483
+    T_rec                 +0.000363
+    T_ret*T_ret           +0.000232
+
+============================================================
+Split: train  (43449 samples)
+  Horizon H= 1 (5 min)
+    T_rec     Lasso  MAE=0.1003 RMSE=0.2056 R2=0.9958 bias=-0.0005 | Persistence MAE=0.1014 RMSE=0.2095
+    T_coil    Lasso  MAE=0.1826 RMSE=0.4143 R2=0.9715 bias=-0.0066 | Persistence MAE=0.1774 RMSE=0.4326
+    T_sup     Lasso  MAE=0.1918 RMSE=0.4080 R2=0.9883 bias=-0.0010 | Persistence MAE=0.1918 RMSE=0.4098
+  Horizon H= 2 (10 min)
+    T_rec     Lasso  MAE=0.1575 RMSE=0.2913 R2=0.9916 bias=-0.0009 | Persistence MAE=0.1654 RMSE=0.3022
+    T_coil    Lasso  MAE=0.2717 RMSE=0.5407 R2=0.9514 bias=-0.0110 | Persistence MAE=0.2633 RMSE=0.5706
+    T_sup     Lasso  MAE=0.2992 RMSE=0.6004 R2=0.9746 bias=-0.0024 | Persistence MAE=0.2992 RMSE=0.6033
+  Horizon H= 4 (20 min)
+    T_rec     Lasso  MAE=0.2434 RMSE=0.3985 R2=0.9843 bias=-0.0017 | Persistence MAE=0.2729 RMSE=0.4310
+    T_coil    Lasso  MAE=0.3985 RMSE=0.7024 R2=0.9180 bias=-0.0164 | Persistence MAE=0.3925 RMSE=0.7410
+    T_sup     Lasso  MAE=0.4600 RMSE=0.8514 R2=0.9489 bias=-0.0059 | Persistence MAE=0.4636 RMSE=0.8616
+  Horizon H= 8 (40 min)
+    T_rec     Lasso  MAE=0.3736 RMSE=0.5504 R2=0.9700 bias=-0.0032 | Persistence MAE=0.4604 RMSE=0.6430
+    T_coil    Lasso  MAE=0.5638 RMSE=0.9014 R2=0.8649 bias=-0.0217 | Persistence MAE=0.5829 RMSE=0.9655
+    T_sup     Lasso  MAE=0.6840 RMSE=1.1467 R2=0.9072 bias=-0.0132 | Persistence MAE=0.7018 RMSE=1.1747
+  Horizon H=12 (60 min)
+    T_rec     Lasso  MAE=0.4736 RMSE=0.6629 R2=0.9565 bias=-0.0048 | Persistence MAE=0.6256 RMSE=0.8282
+    T_coil    Lasso  MAE=0.6719 RMSE=1.0231 R2=0.8259 bias=-0.0249 | Persistence MAE=0.7239 RMSE=1.1173
+    T_sup     Lasso  MAE=0.8438 RMSE=1.3331 R2=0.8746 bias=-0.0198 | Persistence MAE=0.8800 RMSE=1.3808
+
+============================================================
+Split: validation  (25549 samples)
+  Horizon H= 1 (5 min)
+    T_rec     Lasso  MAE=0.1079 RMSE=0.2237 R2=0.9960 bias=+0.0032 | Persistence MAE=0.1084 RMSE=0.2274
+    T_coil    Lasso  MAE=0.1801 RMSE=0.4100 R2=0.9744 bias=+0.0054 | Persistence MAE=0.1735 RMSE=0.4233
+    T_sup     Lasso  MAE=0.1946 RMSE=0.4318 R2=0.9874 bias=-0.0002 | Persistence MAE=0.1941 RMSE=0.4348
+  Horizon H= 2 (10 min)
+    T_rec     Lasso  MAE=0.1681 RMSE=0.3212 R2=0.9917 bias=+0.0063 | Persistence MAE=0.1761 RMSE=0.3316
+    T_coil    Lasso  MAE=0.2759 RMSE=0.5560 R2=0.9529 bias=+0.0117 | Persistence MAE=0.2648 RMSE=0.5838
+    T_sup     Lasso  MAE=0.3090 RMSE=0.6335 R2=0.9729 bias=-0.0005 | Persistence MAE=0.3071 RMSE=0.6365
+  Horizon H= 4 (20 min)
+    T_rec     Lasso  MAE=0.2601 RMSE=0.4453 R2=0.9840 bias=+0.0123 | Persistence MAE=0.2910 RMSE=0.4772
+    T_coil    Lasso  MAE=0.4203 RMSE=0.7408 R2=0.9163 bias=+0.0244 | Persistence MAE=0.4087 RMSE=0.7789
+    T_sup     Lasso  MAE=0.4957 RMSE=0.9104 R2=0.9440 bias=-0.0005 | Persistence MAE=0.4938 RMSE=0.9196
+  Horizon H= 8 (40 min)
+    T_rec     Lasso  MAE=0.4025 RMSE=0.6185 R2=0.9692 bias=+0.0235 | Persistence MAE=0.4934 RMSE=0.7106
+    T_coil    Lasso  MAE=0.6179 RMSE=0.9798 R2=0.8537 bias=+0.0462 | Persistence MAE=0.6285 RMSE=1.0431
+    T_sup     Lasso  MAE=0.7706 RMSE=1.2632 R2=0.8922 bias=+0.0017 | Persistence MAE=0.7744 RMSE=1.2870
+  Horizon H=12 (60 min)
+    T_rec     Lasso  MAE=0.5159 RMSE=0.7505 R2=0.9546 bias=+0.0337 | Persistence MAE=0.6731 RMSE=0.9159
+    T_coil    Lasso  MAE=0.7540 RMSE=1.1494 R2=0.7986 bias=+0.0623 | Persistence MAE=0.7990 RMSE=1.2430
+    T_sup     Lasso  MAE=0.9733 RMSE=1.5126 R2=0.8454 bias=+0.0066 | Persistence MAE=0.9888 RMSE=1.5564
