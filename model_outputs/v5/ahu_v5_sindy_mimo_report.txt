@@ -1,5 +1,5 @@
 AHU v5 SINDy-MIMO model report
-Generated: 2026-06-19T12:10:26
+Generated: 2026-06-19T12:48:06
 Alpha (Lasso L1): 0.0001
 Frequency: 5 min
 Exogenous (real values in rollout): ['T_out', 'T_ret']

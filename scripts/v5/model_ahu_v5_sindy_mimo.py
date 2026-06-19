@@ -361,72 +361,80 @@ def build_plot_data(
     models: dict[str, LassoModel],
     freq_min: int,
 ) -> dict:
-    """Build JSON payload for 1-step and multi-step HTML plots."""
-    h1_preds = rollout(models, val_samples, 1)
-    h4_preds = rollout(models, val_samples, 4)
-    h12_preds = rollout(models, val_samples, 12)
+    """Build JSON payload for multi-step HTML plots.
 
-    n = min(len(h1_preds), len(h4_preds), len(h12_preds))
-    timestamps = [val_samples[i + 1].timestamp for i in range(n)]
+    Each horizon H has its own correctly aligned (true, pred, persistence) triple:
+      - true[i]        = val_samples[i + H].x_now[state]
+      - pred[i]        = rollout starting from val_samples[i], predicting H steps ahead
+      - persistence[i] = val_samples[i].x_now[state]  (X(t) as proxy for X(t+H))
+    All three are aligned to the same anchor index i, so metrics computed from them
+    are correct.  The HTML shows each horizon in its own panel.
+    """
+    plot_horizons = [1, 4, 12]
+    rollouts: dict[int, list[dict[str, float]]] = {}
+    for H in plot_horizons:
+        rollouts[H] = rollout(models, val_samples, H)
+
+    # Use the shortest rollout length as common n
+    n = min(len(rollouts[H]) for H in plot_horizons)
+
+    # Timestamps: anchor at i (start of prediction window)
+    timestamps = [val_samples[i].timestamp for i in range(n)]
 
     series: dict = {}
     for state in STATES:
-        true = [val_samples[i + 1].x_now[state] for i in range(n)]
-        pers = [val_samples[i].x_now[state]      for i in range(n)]
-        series[state] = {
-            "true":        true,
-            "persistence": pers,
-            "lasso_h1":    [h1_preds[i][state]  for i in range(n)],
-            "lasso_h4":    [h4_preds[i][state]  for i in range(n)],
-            "lasso_h12":   [h12_preds[i][state] for i in range(n)],
-        }
-    return {"timestamps": timestamps, "states": series, "freqMin": freq_min}
+        horizon_data: dict[str, list[float]] = {}
+        for H in plot_horizons:
+            preds = rollouts[H]
+            horizon_data[f"true_h{H}"]        = [val_samples[i + H].x_now[state] for i in range(n)]
+            horizon_data[f"persistence_h{H}"] = [val_samples[i].x_now[state]     for i in range(n)]
+            horizon_data[f"lasso_h{H}"]       = [preds[i][state]                 for i in range(n)]
+        series[state] = horizon_data
+    return {"timestamps": timestamps, "states": series,
+            "freqMin": freq_min, "horizons": plot_horizons}
 
 
 def render_html(plot_data: dict, out_path: Path, alpha: float) -> str:
     data_json = json.dumps(plot_data, separators=(",", ":")).replace("</", "<\\/")
-    states = STATES
-    colors = {
-        "true":        "#111827",
-        "persistence": "#9ca3af",
-        "lasso_h1":    "#2563eb",
-        "lasso_h4":    "#16a34a",
-        "lasso_h12":   "#dc2626",
-    }
-    labels = {
-        "true":        "True",
-        "persistence": "Persistence",
-        "lasso_h1":    "Lasso H=1 (5 min)",
-        "lasso_h4":    "Lasso H=4 (20 min)",
-        "lasso_h12":   "Lasso H=12 (1 h)",
-    }
-    series_keys = ["persistence", "lasso_h1", "lasso_h4", "lasso_h12"]
+    horizons = plot_data["horizons"]
+    freq_min = plot_data["freqMin"]
 
-    # metric table rows
+    h_colors   = {"h1": "#2563eb", "h4": "#16a34a", "h12": "#dc2626"}
+    h_labels   = {H: f"H={H} ({H * freq_min} min)" for H in horizons}
+    pers_color = "#9ca3af"
+    true_color = "#111827"
+
+    # metric table: one block per horizon, showing lasso vs persistence
     metric_rows = []
-    for state in states:
-        sd = plot_data["states"][state]
-        tv = sd["true"]
-        for sk in series_keys:
-            pv = sd[sk]
-            errs = [p - t for t, p in zip(tv, pv)]
-            mae  = sum(abs(e) for e in errs) / len(errs)
-            rmse = math.sqrt(sum(e*e for e in errs) / len(errs))
-            bias = sum(errs) / len(errs)
-            metric_rows.append(
-                f"<tr><td>{state}</td><td>{labels[sk]}</td>"
-                f"<td>{mae:.4f}</td><td>{rmse:.4f}</td><td>{bias:+.4f}</td></tr>"
-            )
+    for H in horizons:
+        hk = f"h{H}"
+        for state in STATES:
+            sd = plot_data["states"][state]
+            tv   = sd[f"true_h{H}"]
+            pv   = sd[f"lasso_h{H}"]
+            persv = sd[f"persistence_h{H}"]
+            for label, vals in [(f"Lasso {h_labels[H]}", pv),
+                                (f"Persistence {h_labels[H]}", persv)]:
+                errs = [v - t for t, v in zip(tv, vals)]
+                mae  = sum(abs(e) for e in errs) / len(errs)
+                rmse = math.sqrt(sum(e*e for e in errs) / len(errs))
+                bias = sum(errs) / len(errs)
+                metric_rows.append(
+                    f"<tr><td>{state}</td><td>{label}</td>"
+                    f"<td>{mae:.4f}</td><td>{rmse:.4f}</td><td>{bias:+.4f}</td></tr>"
+                )
 
-    # panel sections
+    # one panel per (state × horizon): true + persistence + lasso
     sections = []
-    for state in states:
-        key = f"{state}_values"
-        sections.append(f"""
+    for state in STATES:
+        for H in horizons:
+            key = f"{state}_h{H}"
+            title = f"{state} — H={H} ({H*freq_min} min ahead)"
+            sections.append(f"""
     <section class="panel">
       <div class="panel-head">
         <div>
-          <div class="panel-title">{state} — value prediction</div>
+          <div class="panel-title">{title}</div>
           <div class="window-label" data-window="{key}"></div>
         </div>
         <div class="tools">
@@ -435,21 +443,24 @@ def render_html(plot_data: dict, out_path: Path, alpha: float) -> str:
           <button type="button" data-action="reset"    data-target="{key}">Reset</button>
         </div>
       </div>
-      <canvas data-chart="{key}" data-state="{state}" height="360"></canvas>
+      <canvas data-chart="{key}" data-state="{state}" data-horizon="{H}" height="300"></canvas>
       <div class="readout" data-readout="{key}"></div>
     </section>""")
-
-    legend_html = "".join(
-        f'<span class="legend-item">'
-        f'<span class="swatch" style="background:{colors[s]}"></span>{labels[s]}'
-        f'</span>'
-        for s in ["true"] + series_keys
-    )
 
     first = html_mod.escape(plot_data["timestamps"][0])
     last  = html_mod.escape(plot_data["timestamps"][-1])
 
-    script = _make_script(data_json, colors, series_keys)
+    legend_html = (
+        f'<span class="legend-item"><span class="swatch" style="background:{true_color}"></span>True</span>'
+        f'<span class="legend-item"><span class="swatch" style="background:{pers_color}"></span>Persistence</span>'
+        + "".join(
+            f'<span class="legend-item"><span class="swatch" style="background:{h_colors[f"h{H}"]}"></span>Lasso {h_labels[H]}</span>'
+            for H in horizons
+        )
+    )
+
+    script = _make_script(data_json, true_color, pers_color,
+                          {f"h{H}": h_colors[f"h{H}"] for H in horizons}, horizons)
 
     return f"""<!doctype html>
 <html lang="en">
@@ -473,7 +484,7 @@ def render_html(plot_data: dict, out_path: Path, alpha: float) -> str:
     .tools{{display:flex;gap:6px}}
     button{{border:1px solid #cbd5e1;background:#fff;color:#111827;border-radius:6px;padding:6px 9px;font-size:12px;cursor:pointer}}
     button:hover{{background:#f3f4f6}}
-    canvas{{width:100%;height:360px;display:block;border:1px solid #e5e7eb;cursor:grab;touch-action:none}}
+    canvas{{width:100%;height:300px;display:block;border:1px solid #e5e7eb;cursor:grab;touch-action:none}}
     canvas:active{{cursor:grabbing}}
     .readout{{min-height:18px;margin-top:8px;color:#374151;font-size:13px;font-variant-numeric:tabular-nums}}
     table{{width:100%;border-collapse:collapse;background:#fff;border:1px solid #d1d5db;border-radius:8px;overflow:hidden;font-size:14px;margin-bottom:18px}}
@@ -505,33 +516,45 @@ def render_html(plot_data: dict, out_path: Path, alpha: float) -> str:
 """
 
 
-def _make_script(data_json: str, colors: dict, series_keys: list[str]) -> str:
-    colors_json = json.dumps(colors)
-    skeys_json  = json.dumps(series_keys)
-    # JS is kept as a plain string (no f-string) to avoid brace-escaping issues.
+def _make_script(
+    data_json: str,
+    true_color: str,
+    pers_color: str,
+    h_colors: dict,       # {"h1": "#...", "h4": "#...", "h12": "#..."}
+    horizons: list[int],
+) -> str:
+    h_colors_json = json.dumps(h_colors)
+    horizons_json = json.dumps(horizons)
     js = (
         "const D=" + data_json + ";\n"
-        "const COLORS=" + colors_json + ";\n"
-        "const SKEYS=" + skeys_json + ";\n"
+        "const TRUE_COLOR='" + true_color + "';\n"
+        "const PERS_COLOR='" + pers_color + "';\n"
+        "const H_COLORS=" + h_colors_json + ";\n"
+        "const HORIZONS=" + horizons_json + ";\n"
         "const charts=new Map();\n"
         "function clamp(v,a,b){return Math.max(a,Math.min(b,v));}\n"
         "function fmtTs(t){return t.slice(0,16);}\n"
         "function makeChart(canvas){\n"
         "  const n=D.timestamps.length;\n"
+        "  const H=Number(canvas.dataset.horizon);\n"
+        "  const hk='h'+H;\n"
+        "  const state=canvas.dataset.state;\n"
+        "  const sd=D.states[state];\n"
         "  return{key:canvas.dataset.chart,canvas,ctx:canvas.getContext('2d'),\n"
-        "    state:canvas.dataset.state,start:0,end:n-1,\n"
-        "    hoverIndex:null,dragging:false,dragStartX:0,\n"
-        "    dragStartStart:0,dragStartEnd:n-1,cssWidth:0,cssHeight:0};}\n"
-        "function chartArea(c){return{left:66,top:22,width:c.cssWidth-90,height:c.cssHeight-74};}\n"
+        "    state,H,hk,\n"
+        "    trueArr:sd['true_h'+H],persArr:sd['persistence_h'+H],lassoArr:sd['lasso_h'+H],\n"
+        "    start:0,end:n-1,hoverIndex:null,dragging:false,\n"
+        "    dragStartX:0,dragStartStart:0,dragStartEnd:n-1,cssWidth:0,cssHeight:0};}\n"
+        "function chartArea(c){return{left:66,top:22,width:c.cssWidth-90,height:c.cssHeight-54};}\n"
         "function visBounds(c){\n"
-        "  const sd=D.states[c.state];\n"
         "  const l=Math.max(0,Math.floor(c.start)),r=Math.min(D.timestamps.length-1,Math.ceil(c.end));\n"
         "  let mn=Infinity,mx=-Infinity;\n"
-        "  for(const s of['true',...SKEYS]){const a=sd[s];for(let i=l;i<=r;i++){if(a[i]<mn)mn=a[i];if(a[i]>mx)mx=a[i];}}\n"
+        "  for(const arr of[c.trueArr,c.persArr,c.lassoArr]){\n"
+        "    for(let i=l;i<=r;i++){if(arr[i]<mn)mn=arr[i];if(arr[i]>mx)mx=arr[i];}}\n"
         "  const mg=(mx-mn)*0.1||0.5;return{min:mn-mg,max:mx+mg};}\n"
         "function resizeCanvas(c){\n"
         "  const rect=c.canvas.getBoundingClientRect();const dpr=window.devicePixelRatio||1;\n"
-        "  const w=Math.max(320,Math.floor(rect.width));const h=Number(c.canvas.getAttribute('height'))||360;\n"
+        "  const w=Math.max(320,Math.floor(rect.width));const h=Number(c.canvas.getAttribute('height'))||300;\n"
         "  c.canvas.width=Math.floor(w*dpr);c.canvas.height=Math.floor(h*dpr);\n"
         "  c.ctx.setTransform(dpr,0,0,dpr,0,0);c.cssWidth=w;c.cssHeight=h;}\n"
         "function xFor(c,i,a){return a.left+((i-c.start)/(c.end-c.start||1))*a.width;}\n"
@@ -546,7 +569,7 @@ def _make_script(data_json: str, colors: dict, series_keys: list[str]) -> str:
         "  ctx.stroke();ctx.restore();}\n"
         "function drawChart(c){\n"
         "  const ctx=c.ctx;const w=c.cssWidth;const h=c.cssHeight;if(!w||!h)return;\n"
-        "  const a=chartArea(c);const b=visBounds(c);const sd=D.states[c.state];\n"
+        "  const a=chartArea(c);const b=visBounds(c);\n"
         "  ctx.clearRect(0,0,w,h);ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);\n"
         "  ctx.strokeStyle='#e5e7eb';ctx.lineWidth=1;\n"
         "  ctx.fillStyle='#6b7280';ctx.font='12px Arial';ctx.textAlign='right';ctx.textBaseline='middle';\n"
@@ -554,19 +577,22 @@ def _make_script(data_json: str, colors: dict, series_keys: list[str]) -> str:
         "    const v=b.min+(b.max-b.min)*t/4;const y=yFor(v,a,b);\n"
         "    ctx.beginPath();ctx.moveTo(a.left,y);ctx.lineTo(a.left+a.width,y);ctx.stroke();\n"
         "    ctx.fillText(v.toFixed(2),a.left-8,y);}\n"
-        "  drawLine(ctx,c,sd['true'],a,b,'#111827',1.8);\n"
-        "  for(const s of SKEYS)drawLine(ctx,c,sd[s],a,b,COLORS[s],1.4);\n"
+        "  drawLine(ctx,c,c.trueArr,a,b,TRUE_COLOR,1.8);\n"
+        "  drawLine(ctx,c,c.persArr,a,b,PERS_COLOR,1.4);\n"
+        "  drawLine(ctx,c,c.lassoArr,a,b,H_COLORS[c.hk],1.6);\n"
         "  ctx.strokeStyle='#9ca3af';ctx.strokeRect(a.left,a.top,a.width,a.height);\n"
         "  const li=Math.max(0,Math.round(c.start)),ri=Math.min(D.timestamps.length-1,Math.round(c.end));\n"
         "  ctx.fillStyle='#6b7280';ctx.textAlign='left';ctx.textBaseline='top';\n"
-        "  ctx.fillText(fmtTs(D.timestamps[li]),a.left,a.top+a.height+12);\n"
-        "  ctx.textAlign='right';ctx.fillText(fmtTs(D.timestamps[ri]),a.left+a.width,a.top+a.height+12);\n"
+        "  ctx.fillText(fmtTs(D.timestamps[li]),a.left,a.top+a.height+8);\n"
+        "  ctx.textAlign='right';ctx.fillText(fmtTs(D.timestamps[ri]),a.left+a.width,a.top+a.height+8);\n"
         "  if(c.hoverIndex!==null){\n"
         "    const i=clamp(c.hoverIndex,li,ri);const x=xFor(c,i,a);\n"
-        "    ctx.strokeStyle='#374151';ctx.beginPath();ctx.moveTo(x,a.top);ctx.lineTo(x,a.top+a.height);ctx.stroke();\n"
-        "    const parts=[fmtTs(D.timestamps[i]),'True='+sd['true'][i].toFixed(3)];\n"
-        "    for(const s of SKEYS)parts.push(s+'='+sd[s][i].toFixed(3));\n"
-        "    const ro=document.querySelector('[data-readout=\"'+c.key+'\"]');if(ro)ro.textContent=parts.join(' | ');}\n"
+        "    ctx.strokeStyle='#374151';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,a.top);ctx.lineTo(x,a.top+a.height);ctx.stroke();\n"
+        "    const ro=document.querySelector('[data-readout=\"'+c.key+'\"]');\n"
+        "    if(ro)ro.textContent=fmtTs(D.timestamps[i])\n"
+        "      +' | True='+c.trueArr[i].toFixed(3)\n"
+        "      +' | Pers='+c.persArr[i].toFixed(3)\n"
+        "      +' | Lasso='+c.lassoArr[i].toFixed(3);}\n"
         "  const lbl=document.querySelector('[data-window=\"'+c.key+'\"]');\n"
         "  if(lbl)lbl.textContent=fmtTs(D.timestamps[li])+' to '+fmtTs(D.timestamps[ri])+' ('+(ri-li+1)+' pts)';}\n"
         "function zoom(c,ci,factor){\n"
