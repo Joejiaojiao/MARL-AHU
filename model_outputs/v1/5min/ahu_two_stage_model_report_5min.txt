@@ -1,0 +1,44 @@
+AHU two-stage dynamic model report
+Generated at: 2026-06-03T13:07:38
+Split directory: C:\Users\haojie\Project\Degree\data_processed\splits
+Inputs: T_out, T_ret, T_rec, T_coil, T_sup, pressure_hex
+No actuator/control signals are used.
+Model target: predict delta = X(t+horizon) - X(t), then reconstruct X_pred = X(t) + delta_pred.
+Horizons: 5 min
+Lag rows: 3
+Tree ensemble: residual/delta trees, trees=18, max_depth=8, max_samples=18000
+
+Closer-to analysis on validation set — 5min horizon
+  (For each prediction R(t+1): is it closer to true X(t+1) or to previous X(t)?)
+  T_rec ridge_arx         closer_to_X(t+1)=29.2%  closer_to_X(t)=55.8%  tied=15.1%
+  T_rec tree_ensemble     closer_to_X(t+1)=27.9%  closer_to_X(t)=57.1%  tied=15.1%
+  T_sup ridge_arx         closer_to_X(t+1)=21.6%  closer_to_X(t)=74.4%  tied=4.1%
+  T_sup tree_ensemble     closer_to_X(t+1)=14.6%  closer_to_X(t)=81.3%  tied=4.1%
+
+Horizon: 5 min (1 steps)
+Feature count: 50
+Samples: train=41742, validation=9546, test=8707
+
+Subsystem: heat_exchanger
+Target: T_rec(t+1)
+train      persistence  n= 41742 MAE=0.0779 RMSE=0.1327 R2=0.9984 bias=-0.0014
+train      ridge_arx    n= 41742 MAE=0.0726 RMSE=0.1208 R2=0.9987 bias=0.0000
+train      tree_ensemble n= 41742 MAE=0.0683 RMSE=0.1190 R2=0.9987 bias=0.0004
+validation persistence  n=  9546 MAE=0.1049 RMSE=0.1508 R2=0.9950 bias=-0.0030
+validation ridge_arx    n=  9546 MAE=0.0989 RMSE=0.1380 R2=0.9958 bias=-0.0088
+validation tree_ensemble n=  9546 MAE=0.0978 RMSE=0.1348 R2=0.9960 bias=0.0065
+test       persistence  n=  8707 MAE=0.0751 RMSE=0.1443 R2=0.9979 bias=-0.0015
+test       ridge_arx    n=  8707 MAE=0.0754 RMSE=0.1363 R2=0.9981 bias=-0.0040
+test       tree_ensemble n=  8707 MAE=0.0709 RMSE=0.1373 R2=0.9981 bias=0.0031
+
+Subsystem: heating_coil
+Target: T_sup(t+1)
+train      persistence  n= 41742 MAE=0.1518 RMSE=0.2526 R2=0.9957 bias=0.0000
+train      ridge_arx    n= 41742 MAE=0.1460 RMSE=0.2318 R2=0.9964 bias=-0.0000
+train      tree_ensemble n= 41742 MAE=0.1398 RMSE=0.2300 R2=0.9964 bias=-0.0001
+validation persistence  n=  9546 MAE=0.1294 RMSE=0.1929 R2=0.9856 bias=0.0045
+validation ridge_arx    n=  9546 MAE=0.1243 RMSE=0.1788 R2=0.9876 bias=-0.0092
+validation tree_ensemble n=  9546 MAE=0.1180 RMSE=0.1747 R2=0.9882 bias=0.0034
+test       persistence  n=  8707 MAE=0.1876 RMSE=0.3600 R2=0.9924 bias=-0.0020
+test       ridge_arx    n=  8707 MAE=0.1791 RMSE=0.3341 R2=0.9934 bias=-0.0077
+test       tree_ensemble n=  8707 MAE=0.1737 RMSE=0.3306 R2=0.9935 bias=0.0005

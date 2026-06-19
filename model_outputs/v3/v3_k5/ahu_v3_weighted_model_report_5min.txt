@@ -1,0 +1,40 @@
+AHU two-stage v3 weighted delta model report
+Generated at: 2026-06-03T15:51:56
+Split directory: C:\Users\haojie\Project\Degree\data_processed\splits
+Prediction horizon: 5 min (one step ahead)
+Sequence window: [t-12 ... t]
+Sample weight: w = 1 + 5.0 * |delta|
+Target: delta = X(t+1) - X(t), reconstructed as X_pred(t+1) = X(t) + delta_pred.
+Subsystem inputs:
+  heat_exchanger: T_out, T_ret, T_rec, pressure_hex
+  heating_coil:   T_rec, T_coil, T_sup
+
+Subsystem: heat_exchanger  target: T_rec(t+1)
+Feature count: 104
+Train samples: 25236  (weighted)
+train      persistence        n= 25236 MAE=0.0832 RMSE=0.1355 R2=0.9982 bias=-0.0018
+train      w_ridge            n= 25236 MAE=0.0869 RMSE=0.1311 R2=0.9983 bias=-0.0003
+train      w_tree             n= 25236 MAE=0.0939 RMSE=0.1332 R2=0.9982 bias=0.0052
+validation persistence        n= 16177 MAE=0.0916 RMSE=0.1481 R2=0.9982 bias=-0.0021
+validation w_ridge            n= 16177 MAE=0.0964 RMSE=0.1504 R2=0.9981 bias=0.0041
+validation w_tree             n= 16177 MAE=0.1066 RMSE=0.1556 R2=0.9980 bias=0.0045
+test       persistence        n=  5649 MAE=0.0790 RMSE=0.1441 R2=0.9980 bias=-0.0026
+test       w_ridge            n=  5649 MAE=0.0958 RMSE=0.1616 R2=0.9975 bias=0.0033
+test       w_tree             n=  5649 MAE=0.1036 RMSE=0.1564 R2=0.9977 bias=0.0179
+  w_ridge  closer_to_X(t+1)=35.3%  closer_to_X(t)=49.8%
+  w_tree   closer_to_X(t+1)=35.2%  closer_to_X(t)=49.9%
+
+Subsystem: heating_coil  target: T_sup(t+1)
+Feature count: 79
+Train samples: 25236  (weighted)
+train      persistence        n= 25236 MAE=0.1494 RMSE=0.2694 R2=0.9941 bias=0.0004
+train      w_ridge            n= 25236 MAE=0.1876 RMSE=0.2841 R2=0.9935 bias=0.0024
+train      w_tree             n= 25236 MAE=0.1797 RMSE=0.3042 R2=0.9925 bias=0.0223
+validation persistence        n= 16177 MAE=0.1471 RMSE=0.2344 R2=0.9955 bias=0.0017
+validation w_ridge            n= 16177 MAE=0.1846 RMSE=0.2594 R2=0.9944 bias=0.0166
+validation w_tree             n= 16177 MAE=0.2318 RMSE=0.4547 R2=0.9829 bias=0.0904
+test       persistence        n=  5649 MAE=0.1770 RMSE=0.3526 R2=0.9920 bias=-0.0011
+test       w_ridge            n=  5649 MAE=0.2123 RMSE=0.3379 R2=0.9927 bias=0.0412
+test       w_tree             n=  5649 MAE=0.2434 RMSE=0.4049 R2=0.9895 bias=0.1029
+  w_ridge  closer_to_X(t+1)=33.3%  closer_to_X(t)=62.6%
+  w_tree   closer_to_X(t+1)=28.3%  closer_to_X(t)=67.6%

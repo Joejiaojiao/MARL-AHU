@@ -1,0 +1,57 @@
+AHU two-stage v4 piecewise-weighted delta model report
+Generated at: 2026-06-04T04:07:17
+Split directory: C:\Users\haojie\Project\Degree\data_preprocessing\splits
+Prediction horizon: 5 min (one step ahead)
+Sequence window: [t-12 ... t]
+Weight function: w = 0.1 if |delta| < 0.05, else w = 1 + 3.0 * |delta|^2.0
+Target: delta = X(t+1) - X(t), reconstructed as X_pred(t+1) = X(t) + delta_pred.
+Gap boundaries skipped (consecutive 5-min check on full window).
+Subsystem inputs:
+  heat_exchanger: T_out, T_ret, T_rec, pressure_hex
+  heating_coil:   T_rec, T_coil, T_sup
+
+Subsystem: heat_exchanger  target: T_rec(t+1)
+Feature count: 104
+Train samples: 25236
+Closer-to analysis on train set:
+  (R(t+1) closer to true X(t+1) vs previous X(t)?)
+  pw_ridge      closer_to_X(t+1)=46.1%  closer_to_X(t)=41.7%  tied=12.1%
+  pw_tree       closer_to_X(t+1)=41.6%  closer_to_X(t)=46.2%  tied=12.1%
+
+Metrics on train set:
+train      persistence        n= 25236 MAE=0.0832 RMSE=0.1355 R2=0.9982 bias=-0.0018
+train      pw_ridge           n= 25236 MAE=0.1242 RMSE=0.1766 R2=0.9969 bias=+0.0099
+train      pw_tree            n= 25236 MAE=0.1048 RMSE=0.1451 R2=0.9979 bias=+0.0004
+
+Closer-to analysis on validation set:
+  (R(t+1) closer to true X(t+1) vs previous X(t)?)
+  pw_ridge      closer_to_X(t+1)=41.7%  closer_to_X(t)=45.5%  tied=12.8%
+  pw_tree       closer_to_X(t+1)=37.1%  closer_to_X(t)=50.1%  tied=12.8%
+
+Metrics on validation set:
+validation persistence        n= 16177 MAE=0.0916 RMSE=0.1481 R2=0.9982 bias=-0.0021
+validation pw_ridge           n= 16177 MAE=0.1332 RMSE=0.2006 R2=0.9966 bias=+0.0222
+validation pw_tree            n= 16177 MAE=0.1183 RMSE=0.1684 R2=0.9976 bias=+0.0068
+
+Subsystem: heating_coil  target: T_sup(t+1)
+Feature count: 79
+Train samples: 25236
+Closer-to analysis on train set:
+  (R(t+1) closer to true X(t+1) vs previous X(t)?)
+  pw_ridge      closer_to_X(t+1)=37.7%  closer_to_X(t)=56.8%  tied=5.4%
+  pw_tree       closer_to_X(t+1)=29.3%  closer_to_X(t)=65.3%  tied=5.4%
+
+Metrics on train set:
+train      persistence        n= 25236 MAE=0.1494 RMSE=0.2694 R2=0.9941 bias=+0.0004
+train      pw_ridge           n= 25236 MAE=0.2916 RMSE=0.4134 R2=0.9861 bias=+0.0297
+train      pw_tree            n= 25236 MAE=0.2018 RMSE=0.3254 R2=0.9914 bias=+0.0223
+
+Closer-to analysis on validation set:
+  (R(t+1) closer to true X(t+1) vs previous X(t)?)
+  pw_ridge      closer_to_X(t+1)=38.5%  closer_to_X(t)=56.4%  tied=5.1%
+  pw_tree       closer_to_X(t+1)=29.5%  closer_to_X(t)=65.5%  tied=5.1%
+
+Metrics on validation set:
+validation persistence        n= 16177 MAE=0.1471 RMSE=0.2344 R2=0.9955 bias=+0.0017
+validation pw_ridge           n= 16177 MAE=0.2932 RMSE=0.3982 R2=0.9869 bias=+0.0570
+validation pw_tree            n= 16177 MAE=0.2466 RMSE=0.4122 R2=0.9859 bias=+0.0736

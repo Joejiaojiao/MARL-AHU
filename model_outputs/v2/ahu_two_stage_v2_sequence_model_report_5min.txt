@@ -1,0 +1,43 @@
+AHU two-stage v2 sequence model report
+Generated at: 2026-06-03T13:46:41
+Split directory: C:\Users\haojie\Project\Degree\data_processed\splits
+Prediction horizon: 5 min
+Sequence window: [t-12 ... t]
+Target: delta = X(t+1)-X(t), reconstructed as X_pred(t+1)=X(t)+delta_pred.
+Subsystem inputs:
+  heat_exchanger: T_out, T_ret, T_rec, pressure_hex
+  heating_coil: T_rec, T_coil, T_sup
+
+Closer-to analysis on validation set — 5min horizon (v2 sequence window)
+  (For each prediction R(t+1): is it closer to true X(t+1) or to previous X(t)?)
+  Note: X(t) approximated as true value of previous consecutive row.
+  T_rec sequence_linear       closer_to_X(t+1)=27.8%  closer_to_X(t)=57.2%  tied=14.9%  n=5398
+  T_rec sequence_tree         closer_to_X(t+1)=24.7%  closer_to_X(t)=60.3%  tied=14.9%  n=5398
+  T_sup sequence_linear       closer_to_X(t+1)=21.3%  closer_to_X(t)=74.7%  tied=4.0%  n=5398
+  T_sup sequence_tree         closer_to_X(t+1)=11.6%  closer_to_X(t)=84.4%  tied=4.0%  n=5398
+
+Subsystem: heat_exchanger
+Target: T_rec(t+1)
+Feature count: 104
+train      persistence  n= 28496 MAE=0.0833 RMSE=0.1369 R2=0.9983 bias=-0.0009
+train      seq_linear   n= 28496 MAE=0.0769 RMSE=0.1247 R2=0.9986 bias=-0.0000
+train      seq_tree     n= 28496 MAE=0.0754 RMSE=0.1258 R2=0.9986 bias=-0.0000
+validation persistence  n=  7269 MAE=0.1048 RMSE=0.1517 R2=0.9948 bias=-0.0051
+validation seq_linear   n=  7269 MAE=0.0982 RMSE=0.1381 R2=0.9957 bias=-0.0085
+validation seq_tree     n=  7269 MAE=0.1007 RMSE=0.1399 R2=0.9956 bias=-0.0045
+test       persistence  n=  5649 MAE=0.0790 RMSE=0.1441 R2=0.9980 bias=-0.0026
+test       seq_linear   n=  5649 MAE=0.0801 RMSE=0.1437 R2=0.9980 bias=-0.0050
+test       seq_tree     n=  5649 MAE=0.0765 RMSE=0.1394 R2=0.9981 bias=-0.0017
+
+Subsystem: heating_coil
+Target: T_sup(t+1)
+Feature count: 79
+train      persistence  n= 28496 MAE=0.1466 RMSE=0.2465 R2=0.9955 bias=0.0006
+train      seq_linear   n= 28496 MAE=0.1411 RMSE=0.2280 R2=0.9961 bias=-0.0000
+train      seq_tree     n= 28496 MAE=0.1375 RMSE=0.2293 R2=0.9961 bias=0.0005
+validation persistence  n=  7269 MAE=0.1340 RMSE=0.1979 R2=0.9863 bias=0.0037
+validation seq_linear   n=  7269 MAE=0.1271 RMSE=0.1806 R2=0.9886 bias=0.0025
+validation seq_tree     n=  7269 MAE=0.1251 RMSE=0.1817 R2=0.9885 bias=0.0007
+test       persistence  n=  5649 MAE=0.1770 RMSE=0.3526 R2=0.9920 bias=-0.0011
+test       seq_linear   n=  5649 MAE=0.1668 RMSE=0.3195 R2=0.9934 bias=0.0055
+test       seq_tree     n=  5649 MAE=0.1680 RMSE=0.3302 R2=0.9930 bias=0.0037

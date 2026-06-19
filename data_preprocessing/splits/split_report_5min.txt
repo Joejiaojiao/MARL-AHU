@@ -1,0 +1,25 @@
+AHU model-ready data split report
+Generated at: 2026-06-03T15:51:44
+Input: data_processed\ahu_model_5min.csv
+Method: seasonal-interleaved quarter split (train + validation only)
+  Per quarter in 2022-2023: months 1-2 -> train, month 3 -> validation
+  Data outside 2022-2023 -> train
+  No test set: held-out evaluation deferred to project end.
+Total rows: 72619
+Train:      45899 (63.2%)
+Validation: 26720 (36.8%)
+Columns: timestamp, T_out, T_ret, T_rec, T_coil, T_sup, pressure_hex, u_heat, u_heat_recovery, u_FF1, is_running
+
+train:
+  rows:           45899
+  start:          2021-11-26 05:00:00
+  end:            2023-11-30 23:55:00
+  missing_values: 0
+  months:         2021-11(Aut):257, 2021-12(Win):1371, 2022-01(Win):1702, 2022-02(Win):1835, 2022-04(Spr):581, 2022-05(Spr):2223, 2022-07(Sum):4941, 2022-08(Sum):5261, 2022-10(Aut):1771, 2022-11(Aut):1349, 2023-01(Win):1410, 2023-02(Win):1481, 2023-04(Spr):3502, 2023-05(Spr):4928, 2023-07(Sum):5266, 2023-08(Sum):3995, 2023-10(Aut):2252, 2023-11(Aut):1774
+
+validation:
+  rows:           26720
+  start:          2022-03-01 06:35:00
+  end:            2023-12-31 05:00:00
+  missing_values: 0
+  months:         2022-03(Spr):2949, 2022-06(Sum):5336, 2022-09(Aut):3160, 2022-12(Win):1637, 2023-03(Spr):2026, 2023-06(Sum):5350, 2023-09(Aut):4474, 2023-12(Win):1788
