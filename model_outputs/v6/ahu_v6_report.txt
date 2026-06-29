@@ -1,0 +1,96 @@
+AHU v6 SINDy-MIMO + NSS report
+Generated: 2026-06-29T13:03:06
+Frequency: 5 min
+States (predicted): ['T_rec', 'T_coil', 'T_sup']
+Exogenous (real in rollout): ['T_out', 'T_ret']
+Control inputs (real in rollout): ['u_heat', 'u_heat_recovery', 'u_FF1']
+SINDy feature library: 48 candidates
+SINDy Lasso alpha: 0.0001
+NSS architecture: 17 -> 64,64,32 -> 3
+NSS epochs: 50  lr: 0.001  batch: 512
+
+=== SINDy active coefficients ===
+
+  delta_T_rec  intercept=-0.000494  active=33/48
+    T_out                           +0.11184652
+    T_ret*u_heat                    +0.11158434
+    T_rec*T_out                     +0.11003805
+    u_heat_recovery                 +0.08252303
+    T_rec                           -0.07371761
+    T_rec*u_heat                    -0.06482367
+    T_rec*T_rec                     -0.06468728
+    T_out*u_heat_recovery           -0.06286161
+    T_ret*u_heat_recovery           +0.06224362
+    T_ret*u_FF1                     +0.05931097
+    T_ret*T_ret                     -0.05504659
+    u_FF1                           -0.05288852
+    T_sup*T_ret                     +0.05068156
+    T_out*u_FF1                     +0.04487917
+    T_sup*T_out                     +0.03099011
+    ... (18 more)
+
+  delta_T_coil  intercept=-0.006590  active=46/48
+    T_coil*T_coil                   -0.79155945
+    T_coil*u_FF1                    +0.77652648
+    T_coil                          -0.71292993
+    T_coil*T_out                    +0.49591846
+    T_coil*u_heat                   +0.47426982
+    T_coil*T_sup                    +0.44607717
+    T_sup*u_heat                    +0.40861226
+    T_coil*u_heat_recovery          -0.40188490
+    T_out*u_heat                    -0.37555740
+    T_out*u_heat_recovery           +0.36581671
+    T_sup*T_out                     -0.35107327
+    T_sup*u_heat_recovery           -0.29185289
+    u_heat*u_heat                   -0.28512900
+    u_heat_recovery*u_FF1           +0.28207644
+    T_sup                           +0.24925736
+    ... (31 more)
+
+  delta_T_sup  intercept=-0.000991  active=43/48
+    T_coil*u_heat                   +0.26823180
+    T_sup*T_sup                     -0.26337153
+    T_sup*T_out                     +0.18240319
+    T_coil*T_out                    -0.18105261
+    T_out*u_heat                    -0.17883458
+    T_coil*T_coil                   +0.16802902
+    T_coil*u_heat_recovery          -0.16267461
+    u_heat*u_FF1                    -0.13787597
+    T_out*u_heat_recovery           +0.13163974
+    T_coil                          +0.11974051
+    u_heat*u_heat                   -0.11960650
+    T_sup*u_heat_recovery           -0.10927380
+    T_ret*u_heat                    +0.10220954
+    T_sup*T_ret                     +0.09406112
+    T_rec*T_coil                    -0.08593948
+    ... (28 more)
+
+=== Prediction metrics (gap-aware rollout) ===
+
+--- train (43449 samples) ---
+  H= 1 (5 min ahead, 43448 valid windows)
+    T_rec    Persistence MAE=0.1014 RMSE=0.2095 | SINDy MAE=0.1005 RMSE=0.2042 R2=0.9959 | NSS   MAE=0.0946 RMSE=0.1913 R2=0.9964
+    T_coil   Persistence MAE=0.1774 RMSE=0.4326 | SINDy MAE=0.1797 RMSE=0.4046 R2=0.9728 | NSS   MAE=0.1651 RMSE=0.3715 R2=0.9770
+    T_sup    Persistence MAE=0.1918 RMSE=0.4098 | SINDy MAE=0.1914 RMSE=0.4071 R2=0.9883 | NSS   MAE=0.1797 RMSE=0.3834 R2=0.9896
+  H= 4 (20 min ahead, 37424 valid windows)
+    T_rec    Persistence MAE=0.2215 RMSE=0.3381 | SINDy MAE=0.1883 RMSE=0.2967 R2=0.9913 | NSS   MAE=0.1553 RMSE=0.2531 R2=0.9937
+    T_coil   Persistence MAE=0.3301 RMSE=0.6229 | SINDy MAE=0.3425 RMSE=0.6058 R2=0.9378 | NSS   MAE=0.3025 RMSE=0.5389 R2=0.9508
+    T_sup    Persistence MAE=0.3878 RMSE=0.7146 | SINDy MAE=0.3847 RMSE=0.7023 R2=0.9640 | NSS   MAE=0.3371 RMSE=0.6133 R2=0.9726
+  H=12 (60 min ahead, 26332 valid windows)
+    T_rec    Persistence MAE=0.5284 RMSE=0.6841 | SINDy MAE=0.3212 RMSE=0.4441 R2=0.9803 | NSS   MAE=0.2138 RMSE=0.3177 R2=0.9899
+    T_coil   Persistence MAE=0.6090 RMSE=0.9362 | SINDy MAE=0.5683 RMSE=0.8729 R2=0.8645 | NSS   MAE=0.4918 RMSE=0.7988 R2=0.8865
+    T_sup    Persistence MAE=0.7237 RMSE=1.1437 | SINDy MAE=0.6983 RMSE=1.1114 R2=0.9011 | NSS   MAE=0.5313 RMSE=0.9364 R2=0.9298
+
+--- validation (25549 samples) ---
+  H= 1 (5 min ahead, 25548 valid windows)
+    T_rec    Persistence MAE=0.1084 RMSE=0.2274 | SINDy MAE=0.1092 RMSE=0.2227 R2=0.9960 | NSS   MAE=0.1138 RMSE=0.2161 R2=0.9962
+    T_coil   Persistence MAE=0.1735 RMSE=0.4233 | SINDy MAE=0.1813 RMSE=0.4074 R2=0.9747 | NSS   MAE=0.1825 RMSE=0.4059 R2=0.9749
+    T_sup    Persistence MAE=0.1941 RMSE=0.4348 | SINDy MAE=0.1944 RMSE=0.4314 R2=0.9874 | NSS   MAE=0.2031 RMSE=0.4289 R2=0.9876
+  H= 4 (20 min ahead, 22560 valid windows)
+    T_rec    Persistence MAE=0.2390 RMSE=0.3696 | SINDy MAE=0.2085 RMSE=0.3317 R2=0.9911 | NSS   MAE=0.2000 RMSE=0.3150 R2=0.9920
+    T_coil   Persistence MAE=0.3423 RMSE=0.6285 | SINDy MAE=0.3660 RMSE=0.6107 R2=0.9416 | NSS   MAE=0.3664 RMSE=0.6237 R2=0.9391
+    T_sup    Persistence MAE=0.4070 RMSE=0.7096 | SINDy MAE=0.4091 RMSE=0.7010 R2=0.9652 | NSS   MAE=0.4194 RMSE=0.7172 R2=0.9636
+  H=12 (60 min ahead, 16748 valid windows)
+    T_rec    Persistence MAE=0.5712 RMSE=0.7366 | SINDy MAE=0.3696 RMSE=0.5161 R2=0.9778 | NSS   MAE=0.2733 RMSE=0.3940 R2=0.9870
+    T_coil   Persistence MAE=0.6589 RMSE=0.9667 | SINDy MAE=0.6197 RMSE=0.8839 R2=0.8686 | NSS   MAE=0.6233 RMSE=1.0155 R2=0.8265
+    T_sup    Persistence MAE=0.7943 RMSE=1.1651 | SINDy MAE=0.7843 RMSE=1.1391 R2=0.8946 | NSS   MAE=0.6944 RMSE=1.2002 R2=0.8830

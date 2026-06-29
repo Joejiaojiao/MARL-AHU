@@ -396,8 +396,8 @@ def train_nss(
             best_W = copy.deepcopy(W)
             best_b = copy.deepcopy(b)
 
-        if (epoch + 1) % 20 == 0:
-            print(f"    NSS epoch {epoch+1:3d}/{n_epochs}  loss={avg_loss:.6f}")
+        if (epoch + 1) % 10 == 0:
+            print(f"    NSS epoch {epoch+1:3d}/{n_epochs}  loss={avg_loss:.6f}", flush=True)
 
     # build model with best weights; un-standardise output layer
     # instead of storing y_means/y_stds separately, bake them into the
@@ -423,7 +423,10 @@ def rollout_sindy(
     """Returns (predictions, indices) — only for samples where H consecutive steps exist."""
     preds: list[dict[str, float]] = []
     indices: list[int] = []
-    for i in range(len(samples) - horizon):
+    n_total = len(samples) - horizon
+    for i in range(n_total):
+        if i > 0 and i % 5000 == 0:
+            print(f"    SINDy rollout {i}/{n_total} ({100*i//n_total}%)", flush=True)
         if samples[i].max_horizon < horizon:
             continue
         z = dict(samples[i].z_now)
@@ -454,7 +457,10 @@ def rollout_nss(
     """Returns (predictions, indices) — only for samples where H consecutive steps exist."""
     preds: list[dict[str, float]] = []
     indices: list[int] = []
-    for i in range(len(samples) - horizon):
+    n_total = len(samples) - horizon
+    for i in range(n_total):
+        if i > 0 and i % 5000 == 0:
+            print(f"    NSS rollout {i}/{n_total} ({100*i//n_total}%)", flush=True)
         if samples[i].max_horizon < horizon:
             continue
         z = dict(samples[i].z_now)
@@ -509,6 +515,7 @@ def build_report(
     sindy_models: dict[str, LassoModel],
     nss_model: MLPModel,
     args: argparse.Namespace,
+    precomputed: dict,          # {split: {H: (sindy_preds, sindy_idx, nss_preds, nss_idx)}}
 ) -> list[str]:
     feat_names = sindy_feature_names()
     lines = [
@@ -542,15 +549,11 @@ def build_report(
         for H in HORIZONS:
             if H >= len(samples):
                 continue
-            sindy_p, idx_s = rollout_sindy(sindy_models, samples, H)
-            nss_p,   idx_n = rollout_nss(nss_model, samples, H)
-
+            sindy_p, idx_s, nss_p, idx_n = precomputed[split_name][H]
             tv_all   = {s: true_at(samples, H, s, idx_s) for s in STATES}
             pers_all = {s: persistence_at(samples, H, s, idx_s) for s in STATES}
             tv_nss   = {s: true_at(samples, H, s, idx_n) for s in STATES}
-
-            n_valid = len(idx_s)
-            lines.append(f"  H={H:2d} ({H * args.freq_min} min ahead, {n_valid} valid windows)")
+            lines.append(f"  H={H:2d} ({H * args.freq_min} min ahead, {len(idx_s)} valid windows)")
             for state in STATES:
                 tv      = tv_all[state]
                 m_pers  = metrics(tv, pers_all[state])
@@ -568,19 +571,13 @@ def build_report(
 
 def build_plot_data(
     val_s: list[Sample],
-    sindy_models: dict[str, LassoModel],
-    nss_model: MLPModel,
     freq_min: int,
+    precomputed_val: dict,      # {H: (sindy_preds, sindy_idx, nss_preds, nss_idx)}
 ) -> dict:
-    # SINDy and NSS filter on identical max_horizon, so indices are the same
-    raw_sindy = {H: rollout_sindy(sindy_models, val_s, H) for H in HORIZONS}
-    raw_nss   = {H: rollout_nss(nss_model,      val_s, H) for H in HORIZONS}
-
-    # common valid indices: intersection across all horizons
+    # common valid indices across all horizons
     common_idx: set[int] | None = None
     for H in HORIZONS:
-        _, idx_s = raw_sindy[H]
-        _, idx_n = raw_nss[H]
+        _, idx_s, _, idx_n = precomputed_val[H]
         h_set = set(idx_s) & set(idx_n)
         common_idx = h_set if common_idx is None else common_idx & h_set
     base_idx = sorted(common_idx or [])
@@ -591,8 +588,7 @@ def build_plot_data(
     for state in STATES:
         sd: dict[str, list[float]] = {}
         for H in HORIZONS:
-            preds_s, idx_s = raw_sindy[H]
-            preds_n, idx_n = raw_nss[H]
+            preds_s, idx_s, preds_n, idx_n = precomputed_val[H]
             s_map = {i: k for k, i in enumerate(idx_s)}
             n_map = {i: k for k, i in enumerate(idx_n)}
             sd[f"true_h{H}"]        = [val_s[i + H].z_now[state]      for i in base_idx]
@@ -884,16 +880,28 @@ def main() -> None:
     )
     print(f"  NSS training complete.")
 
+    # ── precompute all rollouts once ──
+    print("\nRunning rollouts ...")
+    precomputed: dict = {"train": {}, "validation": {}}
+    for split_name, samples in [("train", train_s), ("validation", val_s)]:
+        for H in HORIZONS:
+            print(f"\n  [{split_name}] H={H} — SINDy rollout ...", flush=True)
+            sp, si = rollout_sindy(sindy_models, samples, H)
+            print(f"  [{split_name}] H={H} — NSS rollout ({len(si)} windows) ...", flush=True)
+            np_, ni = rollout_nss(nss_model, samples, H)
+            print(f"  [{split_name}] H={H} done. valid={len(ni)}", flush=True)
+            precomputed[split_name][H] = (sp, si, np_, ni)
+
     # ── report ──
     print("\nBuilding report ...")
-    report = build_report(train_s, val_s, sindy_models, nss_model, args)
+    report = build_report(train_s, val_s, sindy_models, nss_model, args, precomputed)
     report_path = out_dir / "ahu_v6_report.txt"
     report_path.write_text("\n".join(report), encoding="utf-8")
     print(f"Wrote {report_path}")
 
     # ── HTML ──
     print("Generating HTML ...")
-    plot_data = build_plot_data(val_s, sindy_models, nss_model, args.freq_min)
+    plot_data = build_plot_data(val_s, args.freq_min, precomputed["validation"])
     html_str  = render_html(plot_data, args.alpha, args.nss_hidden)
     html_path = out_dir / "ahu_v6_validation.html"
     html_path.write_text(html_str, encoding="utf-8")

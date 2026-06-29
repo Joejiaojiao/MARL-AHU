@@ -1,13 +1,13 @@
-AHU v7 Physics-structured SINDy report
-Generated: 2026-06-29T03:54:58
+AHU v7 Physics-structured SINDy + NSS report
+Generated: 2026-06-29T12:24:45
 Frequency: 5 min
+NSS hidden: 32,32,16  epochs: 50  lr: 0.001
 
 === Subsystem 1: Heat Exchanger ===
   Variables: ['T_rec', 'T_out', 'T_ret', 'u_heat_recovery']
   Feature library: 18 candidates (4 vars: 4+10+4)
   Lasso alpha: 0.0001
-  Target: delta_T_rec
-  Active terms: 16/18  intercept=-0.000494
+  SINDy active: 16/18  intercept=-0.000494
     T_ret*u_heat_recovery                +0.17560833
     T_out                                +0.14852976
     T_rec*T_rec                          -0.10368449
@@ -29,9 +29,8 @@ Frequency: 5 min
   Variables: ['T_sup', 'T_rec', 'T_coil', 'u_heat']
   Feature library: 18 candidates (4 vars: 4+10+4)
   Lasso alpha: 0.0001
-  Target: delta_T_sup
-  Note: T_rec in SS2 is predicted by SS1 during rollout; T_coil always real
-  Active terms: 15/18  intercept=-0.000991
+  Note: T_coil always real; T_rec from SS1 in rollout
+  SINDy active: 15/18  intercept=-0.000991
     T_coil*u_heat                        +0.40257279
     T_sup*T_sup                          -0.30131772
     T_rec*u_heat                         -0.24042563
@@ -52,22 +51,22 @@ Frequency: 5 min
 
 --- train (43449 samples) ---
   H= 1 (5 min ahead, 43448 valid windows)
-    T_rec    Persistence MAE=0.1014 RMSE=0.2095 | SINDy MAE=0.1006 RMSE=0.2048 R2=0.9958
-    T_sup    Persistence MAE=0.1918 RMSE=0.4098 | SINDy MAE=0.1916 RMSE=0.4078 R2=0.9883
+    T_rec    Persistence MAE=0.1014 RMSE=0.2095 | SINDy MAE=0.1006 RMSE=0.2048 R2=0.9958 | NSS   MAE=0.0951 RMSE=0.1959 R2=0.9962
+    T_sup    Persistence MAE=0.1918 RMSE=0.4098 | SINDy MAE=0.1916 RMSE=0.4078 R2=0.9883 | NSS   MAE=0.1849 RMSE=0.3919 R2=0.9892
   H= 4 (20 min ahead, 37424 valid windows)
-    T_rec    Persistence MAE=0.2215 RMSE=0.3381 | SINDy MAE=0.1893 RMSE=0.2986 R2=0.9912
-    T_sup    Persistence MAE=0.3878 RMSE=0.7146 | SINDy MAE=0.3663 RMSE=0.6639 R2=0.9678
+    T_rec    Persistence MAE=0.2215 RMSE=0.3381 | SINDy MAE=0.1893 RMSE=0.2986 R2=0.9912 | NSS   MAE=0.1529 RMSE=0.2533 R2=0.9937
+    T_sup    Persistence MAE=0.3878 RMSE=0.7146 | SINDy MAE=0.3663 RMSE=0.6639 R2=0.9678 | NSS   MAE=0.3069 RMSE=0.5459 R2=0.9783
   H=12 (60 min ahead, 26332 valid windows)
-    T_rec    Persistence MAE=0.5284 RMSE=0.6841 | SINDy MAE=0.3224 RMSE=0.4476 R2=0.9800
-    T_sup    Persistence MAE=0.7237 RMSE=1.1437 | SINDy MAE=0.6004 RMSE=0.9400 R2=0.9292
+    T_rec    Persistence MAE=0.5284 RMSE=0.6841 | SINDy MAE=0.3224 RMSE=0.4476 R2=0.9800 | NSS   MAE=0.2075 RMSE=0.3131 R2=0.9902
+    T_sup    Persistence MAE=0.7237 RMSE=1.1437 | SINDy MAE=0.6004 RMSE=0.9400 R2=0.9292 | NSS   MAE=0.4614 RMSE=0.7757 R2=0.9518
 
 --- validation (25549 samples) ---
   H= 1 (5 min ahead, 25548 valid windows)
-    T_rec    Persistence MAE=0.1084 RMSE=0.2274 | SINDy MAE=0.1083 RMSE=0.2228 R2=0.9960
-    T_sup    Persistence MAE=0.1941 RMSE=0.4348 | SINDy MAE=0.1940 RMSE=0.4317 R2=0.9874
+    T_rec    Persistence MAE=0.1084 RMSE=0.2274 | SINDy MAE=0.1083 RMSE=0.2228 R2=0.9960 | NSS   MAE=0.1091 RMSE=0.2170 R2=0.9962
+    T_sup    Persistence MAE=0.1941 RMSE=0.4348 | SINDy MAE=0.1940 RMSE=0.4317 R2=0.9874 | NSS   MAE=0.2072 RMSE=0.4287 R2=0.9876
   H= 4 (20 min ahead, 22560 valid windows)
-    T_rec    Persistence MAE=0.2390 RMSE=0.3696 | SINDy MAE=0.2057 RMSE=0.3294 R2=0.9912
-    T_sup    Persistence MAE=0.4070 RMSE=0.7096 | SINDy MAE=0.3885 RMSE=0.6655 R2=0.9686
+    T_rec    Persistence MAE=0.2390 RMSE=0.3696 | SINDy MAE=0.2057 RMSE=0.3294 R2=0.9912 | NSS   MAE=0.1822 RMSE=0.2956 R2=0.9929
+    T_sup    Persistence MAE=0.4070 RMSE=0.7096 | SINDy MAE=0.3885 RMSE=0.6655 R2=0.9686 | NSS   MAE=0.3967 RMSE=0.6173 R2=0.9730
   H=12 (60 min ahead, 16748 valid windows)
-    T_rec    Persistence MAE=0.5712 RMSE=0.7366 | SINDy MAE=0.3614 RMSE=0.5020 R2=0.9790
-    T_sup    Persistence MAE=0.7943 RMSE=1.1651 | SINDy MAE=0.6789 RMSE=0.9838 R2=0.9214
+    T_rec    Persistence MAE=0.5712 RMSE=0.7366 | SINDy MAE=0.3614 RMSE=0.5020 R2=0.9790 | NSS   MAE=0.2491 RMSE=0.3673 R2=0.9887
+    T_sup    Persistence MAE=0.7943 RMSE=1.1651 | SINDy MAE=0.6789 RMSE=0.9838 R2=0.9214 | NSS   MAE=0.6732 RMSE=0.9590 R2=0.9253
