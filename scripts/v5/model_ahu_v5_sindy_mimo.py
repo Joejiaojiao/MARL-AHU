@@ -73,14 +73,22 @@ class Sample:
     x_now:  dict[str, float]   # all 5 vars at t
     x_next: dict[str, float]   # all 5 vars at t+1  (ground truth)
     delta:  dict[str, float]   # x_next - x_now  for STATES only
+    max_horizon: int = 0        # max consecutive steps available after this sample
 
 
 def build_samples(rows: list[dict[str, str]], freq_min: int) -> list[Sample]:
     step = timedelta(minutes=freq_min)
     parsed = [datetime.fromisoformat(r["timestamp"]) for r in rows]
+
+    consecutive = [parsed[i + 1] - parsed[i] == step for i in range(len(rows) - 1)]
+
+    run_fwd = [0] * len(rows)
+    for i in range(len(rows) - 2, -1, -1):
+        run_fwd[i] = (1 + run_fwd[i + 1]) if consecutive[i] else 0
+
     samples: list[Sample] = []
     for i in range(len(rows) - 1):
-        if parsed[i + 1] - parsed[i] != step:
+        if not consecutive[i]:
             continue
         try:
             now  = {v: to_float(rows[i],     v) for v in ALL_VARS}
@@ -88,7 +96,7 @@ def build_samples(rows: list[dict[str, str]], freq_min: int) -> list[Sample]:
         except (KeyError, ValueError):
             continue
         delta = {v: nxt[v] - now[v] for v in STATES}
-        samples.append(Sample(rows[i + 1]["timestamp"], now, nxt, delta))
+        samples.append(Sample(rows[i + 1]["timestamp"], now, nxt, delta, run_fwd[i]))
     return samples
 
 # ── SINDy feature library ─────────────────────────────────────────────────────
@@ -253,29 +261,25 @@ def rollout(
     models: dict[str, LassoModel],
     samples: list[Sample],
     horizon: int,
-) -> list[dict[str, float]]:
-    """
-    For each sample i, roll out H steps starting from x(i).
-    T_out, T_ret at future steps taken from real data (samples[i+h].x_next).
-    Returns predicted x at step i+horizon (for all samples where i+horizon exists).
-    """
+) -> tuple[list[dict[str, float]], list[int]]:
+    """Returns (predictions, indices) — only for samples where H consecutive steps exist."""
     preds: list[dict[str, float]] = []
+    indices: list[int] = []
     for i in range(len(samples) - horizon):
-        # check consecutive: samples are already gap-filtered, but rollout
-        # needs all intermediate steps to be consecutive too
+        if samples[i].max_horizon < horizon:
+            continue
         x = dict(samples[i].x_now)
         ts = samples[i].timestamp
-        valid = True
         for h in range(horizon):
             x_pred = predict_one_step(models, x, ts)
-            # inject real exogenous at t+h+1
-            future = samples[i + h].x_next     # = samples[i+h+1].x_now if consecutive
+            future = samples[i + h].x_next
             x_pred[EXOG[0]] = future[EXOG[0]]
             x_pred[EXOG[1]] = future[EXOG[1]]
             x = x_pred
             ts = samples[i + h].timestamp
         preds.append(x)
-    return preds
+        indices.append(i)
+    return preds, indices
 
 # ── metrics ───────────────────────────────────────────────────────────────────
 
@@ -292,13 +296,12 @@ def metrics(true: list[float], pred: list[float]) -> dict[str, float]:
     return {"n": n, "mae": mae, "rmse": rmse, "r2": r2, "bias": bias}
 
 
-def persistence_pred(samples: list[Sample], horizon: int, state: str) -> list[float]:
-    """Persistence baseline: X(t+H) ≈ X(t)."""
-    return [samples[i].x_now[state] for i in range(len(samples) - horizon)]
+def persistence_pred(samples: list[Sample], horizon: int, state: str, indices: list[int]) -> list[float]:
+    return [samples[i].x_now[state] for i in indices]
 
 
-def true_vals(samples: list[Sample], horizon: int, state: str) -> list[float]:
-    return [samples[i + horizon].x_now[state] for i in range(len(samples) - horizon)]
+def true_vals(samples: list[Sample], horizon: int, state: str, indices: list[int]) -> list[float]:
+    return [samples[i + horizon].x_now[state] for i in indices]
 
 # ── report ────────────────────────────────────────────────────────────────────
 
@@ -337,12 +340,12 @@ def build_report(
         for H in HORIZONS:
             if H >= len(samples):
                 continue
-            preds_all = rollout(models, samples, H)
-            lines.append(f"  Horizon H={H:2d} ({H*args.freq_min} min)")
+            preds_all, idx = rollout(models, samples, H)
+            lines.append(f"  Horizon H={H:2d} ({H*args.freq_min} min, {len(idx)} valid windows)")
             for state in STATES:
-                tv = true_vals(samples, H, state)
-                pv = [p[state] for p in preds_all]
-                persv = persistence_pred(samples, H, state)
+                tv    = true_vals(samples, H, state, idx)
+                pv    = [p[state] for p in preds_all]
+                persv = persistence_pred(samples, H, state, idx)
                 m_pred = metrics(tv, pv)
                 m_pers = metrics(tv, persv)
                 lines.append(
@@ -371,24 +374,28 @@ def build_plot_data(
     are correct.  The HTML shows each horizon in its own panel.
     """
     plot_horizons = [1, 4, 12]
-    rollouts: dict[int, list[dict[str, float]]] = {}
+    raw: dict[int, tuple] = {}
     for H in plot_horizons:
-        rollouts[H] = rollout(models, val_samples, H)
+        raw[H] = rollout(models, val_samples, H)
 
-    # Use the shortest rollout length as common n
-    n = min(len(rollouts[H]) for H in plot_horizons)
+    # common valid indices across all horizons
+    common_idx: set[int] | None = None
+    for H in plot_horizons:
+        _, idx = raw[H]
+        common_idx = set(idx) if common_idx is None else common_idx & set(idx)
+    base_idx = sorted(common_idx or [])
 
-    # Timestamps: anchor at i (start of prediction window)
-    timestamps = [val_samples[i].timestamp for i in range(n)]
+    timestamps = [val_samples[i].timestamp for i in base_idx]
 
     series: dict = {}
     for state in STATES:
         horizon_data: dict[str, list[float]] = {}
         for H in plot_horizons:
-            preds = rollouts[H]
-            horizon_data[f"true_h{H}"]        = [val_samples[i + H].x_now[state] for i in range(n)]
-            horizon_data[f"persistence_h{H}"] = [val_samples[i].x_now[state]     for i in range(n)]
-            horizon_data[f"lasso_h{H}"]       = [preds[i][state]                 for i in range(n)]
+            preds, idx = raw[H]
+            idx_map = {i: k for k, i in enumerate(idx)}
+            horizon_data[f"true_h{H}"]        = [val_samples[i + H].x_now[state] for i in base_idx]
+            horizon_data[f"persistence_h{H}"] = [val_samples[i].x_now[state]     for i in base_idx]
+            horizon_data[f"lasso_h{H}"]       = [preds[idx_map[i]][state]        for i in base_idx]
         series[state] = horizon_data
     return {"timestamps": timestamps, "states": series,
             "freqMin": freq_min, "horizons": plot_horizons}

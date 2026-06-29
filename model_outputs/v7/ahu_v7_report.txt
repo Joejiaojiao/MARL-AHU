@@ -1,0 +1,73 @@
+AHU v7 Physics-structured SINDy report
+Generated: 2026-06-29T03:54:58
+Frequency: 5 min
+
+=== Subsystem 1: Heat Exchanger ===
+  Variables: ['T_rec', 'T_out', 'T_ret', 'u_heat_recovery']
+  Feature library: 18 candidates (4 vars: 4+10+4)
+  Lasso alpha: 0.0001
+  Target: delta_T_rec
+  Active terms: 16/18  intercept=-0.000494
+    T_ret*u_heat_recovery                +0.17560833
+    T_out                                +0.14852976
+    T_rec*T_rec                          -0.10368449
+    T_rec*T_out                          +0.08885375
+    T_rec*u_heat_recovery                -0.08306157
+    u_heat_recovery                      +0.08023208
+    T_out*u_heat_recovery                -0.06900078
+    T_rec                                -0.04749761
+    T_out*T_out                          +0.02963716
+    T_rec*T_ret                          -0.02882951
+    T_ret                                +0.02809256
+    sin_day                              +0.02031309
+    cos_day                              -0.01992164
+    u_heat_recovery*u_heat_recovery      -0.00609850
+    cos_year                             -0.00336713
+    sin_year                             +0.00220406
+
+=== Subsystem 2: Heating Coil ===
+  Variables: ['T_sup', 'T_rec', 'T_coil', 'u_heat']
+  Feature library: 18 candidates (4 vars: 4+10+4)
+  Lasso alpha: 0.0001
+  Target: delta_T_sup
+  Note: T_rec in SS2 is predicted by SS1 during rollout; T_coil always real
+  Active terms: 15/18  intercept=-0.000991
+    T_coil*u_heat                        +0.40257279
+    T_sup*T_sup                          -0.30131772
+    T_rec*u_heat                         -0.24042563
+    T_sup*T_rec                          +0.19806168
+    T_coil*T_coil                        +0.19325627
+    T_rec*T_coil                         -0.16170322
+    u_heat*u_heat                        -0.07880811
+    T_sup                                -0.03947313
+    T_coil                               -0.02803456
+    T_rec                                -0.02006487
+    sin_day                              +0.01000342
+    cos_day                              -0.00947799
+    T_sup*u_heat                         -0.00622671
+    T_rec*T_rec                          -0.00530791
+    sin_year                             -0.00016542
+
+=== Prediction metrics (gap-aware rollout) ===
+
+--- train (43449 samples) ---
+  H= 1 (5 min ahead, 43448 valid windows)
+    T_rec    Persistence MAE=0.1014 RMSE=0.2095 | SINDy MAE=0.1006 RMSE=0.2048 R2=0.9958
+    T_sup    Persistence MAE=0.1918 RMSE=0.4098 | SINDy MAE=0.1916 RMSE=0.4078 R2=0.9883
+  H= 4 (20 min ahead, 37424 valid windows)
+    T_rec    Persistence MAE=0.2215 RMSE=0.3381 | SINDy MAE=0.1893 RMSE=0.2986 R2=0.9912
+    T_sup    Persistence MAE=0.3878 RMSE=0.7146 | SINDy MAE=0.3663 RMSE=0.6639 R2=0.9678
+  H=12 (60 min ahead, 26332 valid windows)
+    T_rec    Persistence MAE=0.5284 RMSE=0.6841 | SINDy MAE=0.3224 RMSE=0.4476 R2=0.9800
+    T_sup    Persistence MAE=0.7237 RMSE=1.1437 | SINDy MAE=0.6004 RMSE=0.9400 R2=0.9292
+
+--- validation (25549 samples) ---
+  H= 1 (5 min ahead, 25548 valid windows)
+    T_rec    Persistence MAE=0.1084 RMSE=0.2274 | SINDy MAE=0.1083 RMSE=0.2228 R2=0.9960
+    T_sup    Persistence MAE=0.1941 RMSE=0.4348 | SINDy MAE=0.1940 RMSE=0.4317 R2=0.9874
+  H= 4 (20 min ahead, 22560 valid windows)
+    T_rec    Persistence MAE=0.2390 RMSE=0.3696 | SINDy MAE=0.2057 RMSE=0.3294 R2=0.9912
+    T_sup    Persistence MAE=0.4070 RMSE=0.7096 | SINDy MAE=0.3885 RMSE=0.6655 R2=0.9686
+  H=12 (60 min ahead, 16748 valid windows)
+    T_rec    Persistence MAE=0.5712 RMSE=0.7366 | SINDy MAE=0.3614 RMSE=0.5020 R2=0.9790
+    T_sup    Persistence MAE=0.7943 RMSE=1.1651 | SINDy MAE=0.6789 RMSE=0.9838 R2=0.9214
